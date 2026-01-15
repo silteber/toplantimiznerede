@@ -90,7 +90,7 @@
 
             // PAZARTESİ KONTROLÜ
             if (gunIndex !== 1) {
-                statusEl.innerText = "Bugün ilçe toplantısı yok.";
+                statusEl.innerText = "Bugün ilçe toplantısı yok. Sabır...";
                 statusEl.style.fontSize = "2.5rem"; // Uzun cümle olduğu için fontu biraz küçülttük
                 descEl.innerText = ""; // Açıklama kısmını boşalttık
                 infoBox.style.display = "none";
@@ -117,11 +117,11 @@
 
                 if (!yagisVarMi && !macVarMi) {
                     statusEl.innerText = "BÜRODAYIZ";
-                    descEl.innerText = "Toplantı büroda.";
+                    descEl.innerText = "Mücbir sebebimiz yok ise büroda buluşalım.";
                     document.body.style.backgroundColor = "#27ae60";
                 } else if (yagisVarMi && macVarMi) {
                     statusEl.innerText = "ONLINE";
-                    descEl.innerText = "Trafik kilit ve hava kötü. Zoom üzerinden.";
+                    descEl.innerText = "Trafik kilit ve hava kötü. Muhtemelen Zoom üzerinden.";
                     document.body.style.backgroundColor = "#e74c3c";
                 } else {
                     statusEl.innerText = "TARTIŞMALI";
