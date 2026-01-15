@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofis Durumu - Detaylı</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+            transition: background 1s ease;
+            text-align: center;
+        }
+        .card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        h1 { font-size: 5rem; margin: 0; text-transform: uppercase; }
+        .description { font-size: 1.8rem; margin-bottom: 30px; font-weight: 300; }
+        .details {
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid rgba(255,255,255,0.3);
+            padding-top: 20px;
+            gap: 20px;
+        }
+        .detail-item { flex: 1; }
+        .label { font-size: 0.9rem; text-transform: uppercase; opacity: 0.7; display: block; margin-bottom: 5px; }
+        .value { font-size: 1.2rem; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1 id="status">Yükleniyor...</h1>
+        <p class="description" id="description"></p>
+        
+        <div class="details">
+            <div class="detail-item">
+                <span class="label">Hava Durumu</span>
+                <span class="value" id="weather-val">-</span>
+            </div>
+            <div class="detail-item">
+                <span class="label">Kadıköy'de Maç</span>
+                <span class="value" id="match-val">-</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- AYARLAR ---
+        const API_KEY = '613219e556123f0b9188976e6fc6e418'; 
+        
+        const KADIKOY_MAC_TARIHLERI = [
+            "2026-01-22", "2026-02-25", "2026-02-08", 
+            "2026-02-22", "2026-03-08", "2026-03-22"
+        ];
+
+        // Hava durumunu Türkçe'ye çeviren mini sözlük
+        const havaTurkce = {
+            'Clear': 'Açık / Güneşli',
+            'Clouds': 'Bulutlu',
+            'Rain': 'Yağışlı',
+            'Drizzle': 'Hafif Yağışlı',
+            'Thunderstorm': 'Gök Gürültülü Sağanak',
+            'Snow': 'Karlı',
+            'Mist': 'Sisli',
+            'Fog': 'Yoğun Sisli'
+        };
+
+        async function sistemiCalistir() {
+            const statusEl = document.getElementById('status');
+            const descEl = document.getElementById('description');
+            const weatherVal = document.getElementById('weather-val');
+            const matchVal = document.getElementById('match-val');
+
+            const simdi = new Date();
+            const bugunISO = simdi.toISOString().split('T')[0];
+            const gunIndex = simdi.getDay(); 
+
+            // (Opsiyonel) Sadece Pazartesi kontrolü kalsın dersen:
+            /*
+            if (gunIndex !== 1) {
+                statusEl.innerText = "OFİS GÜNÜ DEĞİL";
+                descEl.innerText = "Bugün ilçe toplantısı yok.";
+                document.body.style.backgroundColor = "#2c3e50";
+                return;
+            }
+            */
+
+            try {
+                // 1. Hava Durumu
+                const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Istanbul&appid=${API_KEY}&units=metric`);
+                const data = await res.json();
+                
+                const havaIngilizce = data.weather[0].main;
+                const havaDurumuTR = havaTurkce[havaIngilizce] || havaIngilizce;
+                const yagisVarMi = ["Rain", "Snow", "Drizzle", "Thunderstorm"].includes(havaIngilizce);
+
+                // 2. Maç Kontrolü
+                const macVarMi = KADIKOY_MAC_TARIHLERI.includes(bugunISO);
+                const macDurumuTR = macVarMi ? "VAR" : "YOK";
+
+                // 3. Ekrana Yazdırma
+                weatherVal.innerText = havaDurumuTR;
+                matchVal.innerText = macDurumuTR;
+
+                // 4. Karar Mantığı
+                if (!yagisVarMi && !macVarMi) {
+                    statusEl.innerText = "BÜRODAYIZ";
+                    descEl.innerText = "Toplantı büroda.";
+                    document.body.style.backgroundColor = "#27ae60"; // Yeşil
+                } else if (yagisVarMi && macVarMi) {
+                    statusEl.innerText = "ONLINE";
+                    descEl.innerText = "Trafik kilit, hava kötü. Zoom linki gruba gelecek.";
+                    document.body.style.backgroundColor = "#e74c3c"; // Kırmızı
+                } else {
+                    statusEl.innerText = "TARTIŞMALI";
+                    descEl.innerText = yagisVarMi ? "Hava biraz bozdu, tartışılır." : "Kadıköy'de maç var, trafik olabilir.";
+                    document.body.style.backgroundColor = "#f39c12"; // Turuncu
+                }
+
+            } catch (err) {
+                statusEl.innerText = "BAĞLANTI HATASI";
+                document.body.style.backgroundColor = "#7f8c8d";
+            }
+        }
+
+        sistemiCalistir();
+    </script>
+</body>
+</html>
