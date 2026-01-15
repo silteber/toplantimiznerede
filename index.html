@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ofis Durumu - Detaylı</title>
+    <title>Ofis Durumu - İlçe Toplantısı</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -22,8 +22,10 @@
             border-radius: 30px;
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            width: 80%;
+            max-width: 600px;
         }
-        h1 { font-size: 5rem; margin: 0; text-transform: uppercase; }
+        h1 { font-size: 3.5rem; margin: 0; text-transform: uppercase; line-height: 1.2; }
         .description { font-size: 1.8rem; margin-bottom: 30px; font-weight: 300; }
         .details {
             display: flex;
@@ -43,7 +45,7 @@
         <h1 id="status">Yükleniyor...</h1>
         <p class="description" id="description"></p>
         
-        <div class="details">
+        <div class="details" id="info-box">
             <div class="detail-item">
                 <span class="label">Hava Durumu</span>
                 <span class="value" id="weather-val">-</span>
@@ -64,7 +66,6 @@
             "2026-02-22", "2026-03-08", "2026-03-22"
         ];
 
-        // Hava durumunu Türkçe'ye çeviren mini sözlük
         const havaTurkce = {
             'Clear': 'Açık / Güneşli',
             'Clouds': 'Bulutlu',
@@ -81,23 +82,24 @@
             const descEl = document.getElementById('description');
             const weatherVal = document.getElementById('weather-val');
             const matchVal = document.getElementById('match-val');
+            const infoBox = document.getElementById('info-box');
 
             const simdi = new Date();
             const bugunISO = simdi.toISOString().split('T')[0];
-            const gunIndex = simdi.getDay(); 
+            const gunIndex = simdi.getDay(); // 1 = Pazartesi
 
-            // (Opsiyonel) Sadece Pazartesi kontrolü kalsın dersen:
-            /*
+            // PAZARTESİ KONTROLÜ
             if (gunIndex !== 1) {
-                statusEl.innerText = "OFİS GÜNÜ DEĞİL";
-                descEl.innerText = "Bugün ilçe toplantısı yok.";
+                statusEl.innerText = "Bugün ilçe toplantısı yok.";
+                statusEl.style.fontSize = "2.5rem"; // Uzun cümle olduğu için fontu biraz küçülttük
+                descEl.innerText = ""; // Açıklama kısmını boşalttık
+                infoBox.style.display = "none";
                 document.body.style.backgroundColor = "#2c3e50";
                 return;
             }
-            */
 
             try {
-                // 1. Hava Durumu
+                // Pazartesi ise verilere bak
                 const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=Istanbul&appid=${API_KEY}&units=metric`);
                 const data = await res.json();
                 
@@ -105,36 +107,26 @@
                 const havaDurumuTR = havaTurkce[havaIngilizce] || havaIngilizce;
                 const yagisVarMi = ["Rain", "Snow", "Drizzle", "Thunderstorm"].includes(havaIngilizce);
 
-                // 2. Maç Kontrolü
                 const macVarMi = KADIKOY_MAC_TARIHLERI.includes(bugunISO);
                 const macDurumuTR = macVarMi ? "VAR" : "YOK";
 
-                // 3. Ekrana Yazdırma
+                statusEl.style.fontSize = "3.5rem"; // Pazartesi günü fontu eski haline getir
                 weatherVal.innerText = havaDurumuTR;
                 matchVal.innerText = macDurumuTR;
+                infoBox.style.display = "flex";
 
-                // 4. Karar Mantığı
                 if (!yagisVarMi && !macVarMi) {
                     statusEl.innerText = "BÜRODAYIZ";
                     descEl.innerText = "Toplantı büroda.";
-                    document.body.style.backgroundColor = "#27ae60"; // Yeşil
+                    document.body.style.backgroundColor = "#27ae60";
                 } else if (yagisVarMi && macVarMi) {
                     statusEl.innerText = "ONLINE";
-                    descEl.innerText = "Trafik kilit, hava kötü. Zoom linki gruba gelecek.";
-                    document.body.style.backgroundColor = "#e74c3c"; // Kırmızı
+                    descEl.innerText = "Trafik kilit ve hava kötü. Zoom üzerinden.";
+                    document.body.style.backgroundColor = "#e74c3c";
                 } else {
                     statusEl.innerText = "TARTIŞMALI";
-                    descEl.innerText = yagisVarMi ? "Hava biraz bozdu, tartışılır." : "Kadıköy'de maç var, trafik olabilir.";
-                    document.body.style.backgroundColor = "#f39c12"; // Turuncu
+                    descEl.innerText = yagisVarMi ? "Hava yağışlı, duruma göre karar verelim." : "Kadıköy'de maç var, trafik yoğun olabilir.";
+                    document.body.style.backgroundColor = "#f39c12";
                 }
 
             } catch (err) {
-                statusEl.innerText = "BAĞLANTI HATASI";
-                document.body.style.backgroundColor = "#7f8c8d";
-            }
-        }
-
-        sistemiCalistir();
-    </script>
-</body>
-</html>
