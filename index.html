@@ -118,14 +118,14 @@
                 if (gunIndex !== hedefGun) {
                     statusEl.innerText = "Bugün ilçe toplantısı yok.";
                     statusEl.style.fontSize = window.innerWidth < 600 ? "1.8rem" : "2.2rem";
-                    descEl.innerText = "Haftalık durum yukarıdadır. " + (hedefGun === 4 ? "Perşembe" : "Pazartesi") + " görüşmek üzere.";
+                    descEl.innerText = (hedefGun === 4 ? "Perşembe" : "Pazartesi") + " görüşmek üzere.";
                     document.body.style.backgroundColor = "#2c3e50";
                 } else {
                     statusEl.style.fontSize = window.innerWidth < 600 ? "2.5rem" : "4rem";
                     
                     if (havaKotu && macVar) {
-                        statusEl.innerText = "ONLINE";
-                        descEl.innerText = "hava kötü ve maç var. Kadıköy'e girilmez. zoom linki iletilecektir.";
+                        statusEl.innerText = "ONLINE OLABİLİR";
+                        descEl.innerText = "hava kötü ve maç var. Kadıköy'e girilmez. zoom diyelim mi?";
                         document.body.style.backgroundColor = "#e74c3c";
                     } else if (havaKotu && !macVar) {
                         statusEl.innerText = "TARTIŞMALI";
@@ -133,7 +133,7 @@
                         document.body.style.backgroundColor = "#f39c12";
                     } else if (!havaKotu && macVar) {
                         statusEl.innerText = "TARTIŞMALI";
-                        descEl.innerText = "kadıköyde fenerin maçı var... bir tartışalım.";
+                        descEl.innerText = "kadıköyde fenerin maçı var... önemli maç değilse büro diyelim.";
                         document.body.style.backgroundColor = "#f39c12";
                     } else {
                         statusEl.innerText = "BÜRODAYIZ";
