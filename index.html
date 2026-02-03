@@ -11,13 +11,13 @@
             height: 100vh; margin: 0; overflow: hidden;
             display: flex; justify-content: center; align-items: center; text-align: center;
             color: var(--text-color); 
-            background: #1a1a1a; /* Varsayılan koyu arka plan */
+            background: #1e293b; /* Siyah yerine gece mavisi ile başlar */
             transition: background 1.5s ease;
         }
 
-        #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 1; }
+        #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
-        /* Atmosferik Modlar */
+        /* --- Atmosferik Modlar --- */
         body.mode-rain #bg-layer { background: #0f172a; }
         body.mode-rain #bg-layer::before { content: ''; position: absolute; width: 100%; height: 200%; top: -100%; left: 0; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 2px, transparent 5px); background-size: 15px 60px; animation: rainFall 0.6s linear infinite; }
         @keyframes rainFall { to { transform: translateY(50%); } }
@@ -50,8 +50,7 @@
         .label { font-size: 0.75rem; text-transform: uppercase; opacity: 0.7; display: block; margin-bottom: 5px; }
         .value { font-weight: bold; color: #ffce54; font-size: 1.1rem; }
 
-        .counter { position: fixed; bottom: 15px; opacity: 0.5; transition: 0.3s; }
-        .counter:hover { opacity: 1; }
+        .counter { position: fixed; bottom: 15px; opacity: 0.6; }
 
         @media (max-width: 600px) { h1 { font-size: 2rem; } .description { font-size: 1.1rem; } }
     </style>
@@ -60,19 +59,19 @@
     <div id="bg-layer"></div>
 
     <div class="card">
-        <div class="forecast-label" id="forecast-time">Veriler Kontrol Ediliyor...</div>
+        <div class="forecast-label" id="forecast-time">Analiz Ediliyor...</div>
         <h1 id="status">Bekleyiniz...</h1>
-        <p class="description" id="description">Hava durumu ve maç takvimi analiz ediliyor.</p>
+        <p class="description" id="description">Sistem verileri topluyor.</p>
         
         <div class="weather-box">
-            <div class="detail-item"><span class="label">Tahmini Hava</span><span id="weather-text" class="value">-</span></div>
+            <div class="detail-item"><span class="label">Tahmin</span><span id="weather-text" class="value">-</span></div>
             <div class="detail-item"><span class="label">Sıcaklık</span><span id="temp-text" class="value">-</span></div>
-            <div class="detail-item"><span class="label">Maç Durumu</span><span id="match-text" class="value">-</span></div>
+            <div class="detail-item"><span class="label">Maç</span><span id="match-text" class="value">-</span></div>
         </div>
     </div>
 
     <div class="counter">
-        <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fsilteber.github.io%2Ftoplantimiznerede&count_bg=%2338BDF8&title_bg=%231E293B&title=Ziyaret" alt="Ziyaret"/>
+        <img src="https://hits.dwyl.com/silteber/toplantimiznerede.svg" alt="Ziyaret Sayısı">
     </div>
 
     <script>
@@ -87,21 +86,18 @@
             
             const simdi = new Date();
             const sinirTarih = new Date("2026-03-08");
-            const hedefGunIndex = (simdi < sinirTarih) ? 4 : 1; // 4: Perşembe, 1: Pazartesi
+            const hedefGunIndex = (simdi < sinirTarih) ? 4 : 1; 
 
             try {
                 const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=Istanbul&appid=${API_KEY}&units=metric&lang=tr`);
                 if (!res.ok) throw new Error("API Hatası");
                 const data = await res.json();
                 
-                // Toplantı gününe ait akşam saatini bulmaya çalış
+                // Hedef günü ara, bulamazsan listedeki son geçerli veriyi al
                 let hedefTahmin = data.list.find(f => {
                     let d = new Date(f.dt * 1000);
                     return d.getDay() === hedefGunIndex && d.getHours() >= 15;
-                });
-
-                // Eğer toplantı günü 5 günlük tahmin sınırının dışındaysa (örn. haftaya Perşembe), mevcut en uzak tahmini al
-                if (!hedefTahmin) hedefTahmin = data.list[data.list.length - 1];
+                }) || data.list[data.list.length - 1];
 
                 const havaMain = hedefTahmin.weather[0].main;
                 const derece = Math.round(hedefTahmin.main.temp);
@@ -115,19 +111,19 @@
                 if (["Rain", "Snow", "Thunderstorm"].includes(havaMain)) puan += 10;
                 const havaKotu = puan >= 8;
 
-                // Arka Planı Güncelle
+                // Arka Plan Güncelleme
                 document.body.className = '';
                 if (macVar) document.body.classList.add('mode-traffic');
                 else if (havaKotu) document.body.classList.add('mode-rain');
                 else document.body.classList.add('mode-sun');
 
-                // Verileri Ekrana Bas
+                // Verileri Yaz
                 timeEl.innerText = tarihMetni + " Tahmini";
                 document.getElementById('weather-text').innerText = havaTurkce[havaMain] || havaMain;
                 document.getElementById('temp-text').innerText = derece + "°C";
                 document.getElementById('match-text').innerText = macVar ? "VAR" : "YOK";
 
-                // Toplantı Günü Karar Mantığı
+                // Senin Metinlerin
                 if (simdi.getDay() !== hedefGunIndex) {
                     statusEl.innerText = "Bugün ilçe toplantısı yok.";
                     descEl.innerText = (hedefGunIndex === 4 ? "Perşembe" : "Pazartesi") + " görüşmek üzere.";
@@ -148,9 +144,10 @@
                 }
 
             } catch (err) {
-                console.error(err);
+                // Hata durumunda bile sayfa boş kalmaz
                 statusEl.innerText = "HATA";
-                descEl.innerText = "Veriler alınamadı. Lütfen daha sonra tekrar deneyiniz.";
+                descEl.innerText = "Veriler şu an alınamıyor, ancak genel kural geçerlidir.";
+                console.error("Hata detayı:", err);
             }
         }
 
