@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İlçe Toplantısı Tahmin Paneli</title>
+    <title>Toplantımız Nerede?</title>
     <style>
         :root { --text-color: #fff; }
         body {
@@ -11,22 +11,22 @@
             height: 100vh; margin: 0; overflow: hidden;
             display: flex; justify-content: center; align-items: center; text-align: center;
             color: var(--text-color); 
-            background: #1e293b; /* Başlangıçta siyah yerine koyu lacivert */
+            background: #1a1a1a; /* Varsayılan koyu arka plan */
             transition: background 1.5s ease;
         }
 
-        #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
+        #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; opacity: 1; }
 
-        /* Arka Plan Modları */
+        /* Atmosferik Modlar */
         body.mode-rain #bg-layer { background: #0f172a; }
         body.mode-rain #bg-layer::before { content: ''; position: absolute; width: 100%; height: 200%; top: -100%; left: 0; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 2px, transparent 5px); background-size: 15px 60px; animation: rainFall 0.6s linear infinite; }
         @keyframes rainFall { to { transform: translateY(50%); } }
 
         body.mode-traffic #bg-layer { background: #000; }
-        body.mode-traffic #bg-layer::after { content: ''; position: absolute; top: 0; left: -50%; width: 200%; height: 100%; background: repeating-linear-gradient(90deg, transparent 0, transparent 50px, rgba(255,50,50,0.2) 50px, rgba(255,180,0,0.2) 150px); transform: skewX(-30deg); filter: blur(30px); animation: trafficFlow 4s linear infinite; }
+        body.mode-traffic #bg-layer::after { content: ''; position: absolute; top: 0; left: -50%; width: 200%; height: 100%; background: repeating-linear-gradient(90deg, transparent 0, transparent 40px, rgba(255,50,50,0.15) 40px, rgba(255,180,0,0.15) 120px); transform: skewX(-30deg); filter: blur(30px); animation: trafficFlow 4s linear infinite; }
         @keyframes trafficFlow { from { transform: translateX(0) skewX(-30deg); } to { transform: translateX(-50%) skewX(-30deg); } }
 
-        body.mode-sun #bg-layer { background: linear-gradient(45deg, #1e3a8a 0%, #1e40af 100%); }
+        body.mode-sun #bg-layer { background: linear-gradient(45deg, #1e3a8a 0%, #0f172a 100%); }
 
         .card {
             background: rgba(0, 0, 0, 0.6);
@@ -36,6 +36,7 @@
             width: 90%; max-width: 650px;
             border: 1px solid rgba(255,255,255,0.1);
             box-sizing: border-box;
+            z-index: 10;
         }
         .forecast-label { font-size: 0.8rem; text-transform: uppercase; color: #38bdf8; margin-bottom: 10px; letter-spacing: 1px; }
         h1 { font-size: 3.2rem; margin: 0; text-transform: uppercase; letter-spacing: 1px; line-height: 1.1; }
@@ -49,24 +50,111 @@
         .label { font-size: 0.75rem; text-transform: uppercase; opacity: 0.7; display: block; margin-bottom: 5px; }
         .value { font-weight: bold; color: #ffce54; font-size: 1.1rem; }
 
-        .counter { position: fixed; bottom: 15px; opacity: 0.4; }
+        .counter { position: fixed; bottom: 15px; opacity: 0.5; transition: 0.3s; }
+        .counter:hover { opacity: 1; }
 
         @media (max-width: 600px) { h1 { font-size: 2rem; } .description { font-size: 1.1rem; } }
     </style>
 </head>
-<body class="mode-sun"> <div id="bg-layer"></div>
+<body class="mode-sun">
+    <div id="bg-layer"></div>
 
     <div class="card">
-        <div class="forecast-label" id="forecast-time">Veriler Alınıyor...</div>
-        <h1 id="status">Yükleniyor...</h1>
-        <p class="description" id="description">Hava durumu ve maç verileri kontrol ediliyor.</p>
+        <div class="forecast-label" id="forecast-time">Veriler Kontrol Ediliyor...</div>
+        <h1 id="status">Bekleyiniz...</h1>
+        <p class="description" id="description">Hava durumu ve maç takvimi analiz ediliyor.</p>
         
         <div class="weather-box">
-            <div class="detail-item"><span class="label">Hava</span><span id="weather-text" class="value">-</span></div>
+            <div class="detail-item"><span class="label">Tahmini Hava</span><span id="weather-text" class="value">-</span></div>
             <div class="detail-item"><span class="label">Sıcaklık</span><span id="temp-text" class="value">-</span></div>
-            <div class="detail-item"><span class="label">Maç</span><span id="match-text" class="value">-</span></div>
+            <div class="detail-item"><span class="label">Maç Durumu</span><span id="match-text" class="value">-</span></div>
         </div>
     </div>
 
     <div class="counter">
-        <img src="
+        <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fsilteber.github.io%2Ftoplantimiznerede&count_bg=%2338BDF8&title_bg=%231E293B&title=Ziyaret" alt="Ziyaret"/>
+    </div>
+
+    <script>
+        const API_KEY = '613219e556123f0b9188976e6fc6e418'; 
+        const KADIKOY_MAC_TARIHLERI = ["2026-02-05", "2026-02-09", "2026-02-22", "2026-03-08", "2026-03-18", "2026-04-05", "2026-04-19"];
+        const havaTurkce = { 'Clear': 'Güneşli', 'Clouds': 'Bulutlu', 'Rain': 'Yağışlı', 'Drizzle': 'Çiseleme', 'Thunderstorm': 'Fırtına', 'Snow': 'Karlı', 'Mist': 'Sisli' };
+
+        async function baslat() {
+            const statusEl = document.getElementById('status');
+            const descEl = document.getElementById('description');
+            const timeEl = document.getElementById('forecast-time');
+            
+            const simdi = new Date();
+            const sinirTarih = new Date("2026-03-08");
+            const hedefGunIndex = (simdi < sinirTarih) ? 4 : 1; // 4: Perşembe, 1: Pazartesi
+
+            try {
+                const res = await fetch(`https://api.openweathermap.org/data/2.5/forecast?q=Istanbul&appid=${API_KEY}&units=metric&lang=tr`);
+                if (!res.ok) throw new Error("API Hatası");
+                const data = await res.json();
+                
+                // Toplantı gününe ait akşam saatini bulmaya çalış
+                let hedefTahmin = data.list.find(f => {
+                    let d = new Date(f.dt * 1000);
+                    return d.getDay() === hedefGunIndex && d.getHours() >= 15;
+                });
+
+                // Eğer toplantı günü 5 günlük tahmin sınırının dışındaysa (örn. haftaya Perşembe), mevcut en uzak tahmini al
+                if (!hedefTahmin) hedefTahmin = data.list[data.list.length - 1];
+
+                const havaMain = hedefTahmin.weather[0].main;
+                const derece = Math.round(hedefTahmin.main.temp);
+                const tahminISO = new Date(hedefTahmin.dt * 1000).toLocaleDateString('en-CA');
+                const macVar = KADIKOY_MAC_TARIHLERI.includes(tahminISO);
+                const tarihMetni = new Date(hedefTahmin.dt * 1000).toLocaleDateString('tr-TR', { weekday: 'long', hour: '2-digit', minute: '2-digit' });
+
+                // Puanlama Sistemi
+                let puan = 0;
+                if (derece < 5) puan += 7;
+                if (["Rain", "Snow", "Thunderstorm"].includes(havaMain)) puan += 10;
+                const havaKotu = puan >= 8;
+
+                // Arka Planı Güncelle
+                document.body.className = '';
+                if (macVar) document.body.classList.add('mode-traffic');
+                else if (havaKotu) document.body.classList.add('mode-rain');
+                else document.body.classList.add('mode-sun');
+
+                // Verileri Ekrana Bas
+                timeEl.innerText = tarihMetni + " Tahmini";
+                document.getElementById('weather-text').innerText = havaTurkce[havaMain] || havaMain;
+                document.getElementById('temp-text').innerText = derece + "°C";
+                document.getElementById('match-text').innerText = macVar ? "VAR" : "YOK";
+
+                // Toplantı Günü Karar Mantığı
+                if (simdi.getDay() !== hedefGunIndex) {
+                    statusEl.innerText = "Bugün ilçe toplantısı yok.";
+                    descEl.innerText = (hedefGunIndex === 4 ? "Perşembe" : "Pazartesi") + " görüşmek üzere.";
+                } else {
+                    if (havaKotu && macVar) {
+                        statusEl.innerText = "ONLINE OLABİLİR";
+                        descEl.innerText = "hava kötü ve maç var. Kadıköy'e girilmez. zoom diyelim mi?";
+                    } else if (havaKotu && !macVar) {
+                        statusEl.innerText = "TARTIŞMALI";
+                        descEl.innerText = "hava kötü ama şekerden değiliz, erimeyiz... herhalde?";
+                    } else if (!havaKotu && macVar) {
+                        statusEl.innerText = "TARTIŞMALI";
+                        descEl.innerText = "kadıköyde fenerin maçı var... önemli maç değilse büro diyelim.";
+                    } else {
+                        statusEl.innerText = "BÜRODAYIZ";
+                        descEl.innerText = "19.30'da görüşürüz, önden gelen çay kahve demlesin.";
+                    }
+                }
+
+            } catch (err) {
+                console.error(err);
+                statusEl.innerText = "HATA";
+                descEl.innerText = "Veriler alınamadı. Lütfen daha sonra tekrar deneyiniz.";
+            }
+        }
+
+        baslat();
+    </script>
+</body>
+</html>
