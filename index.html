@@ -3,35 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>İlçe Toplantısı Durum Paneli</title>
+    <title>İlçe Toplantısı Tahmin Paneli</title>
     <style>
         :root { --text-color: #fff; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             height: 100vh; margin: 0; overflow: hidden;
             display: flex; justify-content: center; align-items: center; text-align: center;
-            color: var(--text-color); background: #1a1a1a; transition: background 1.5s ease;
+            color: var(--text-color); 
+            background: #1e293b; /* Başlangıçta siyah yerine koyu lacivert */
+            transition: background 1.5s ease;
         }
 
-        /* --- Atmosferik Arka Plan Animasyonları --- */
-        #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; transition: opacity 1s; opacity: 0; }
-        body.loaded #bg-layer { opacity: 1; }
+        #bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; }
 
-        /* Kötü Hava / Yağmur */
-        body.mode-rain #bg-layer { background: #1e293b; }
+        /* Arka Plan Modları */
+        body.mode-rain #bg-layer { background: #0f172a; }
         body.mode-rain #bg-layer::before { content: ''; position: absolute; width: 100%; height: 200%; top: -100%; left: 0; background-image: linear-gradient(to bottom, rgba(255,255,255,0.1) 2px, transparent 5px); background-size: 15px 60px; animation: rainFall 0.6s linear infinite; }
         @keyframes rainFall { to { transform: translateY(50%); } }
 
-        /* Trafik (Maç Günü) */
         body.mode-traffic #bg-layer { background: #000; }
         body.mode-traffic #bg-layer::after { content: ''; position: absolute; top: 0; left: -50%; width: 200%; height: 100%; background: repeating-linear-gradient(90deg, transparent 0, transparent 50px, rgba(255,50,50,0.2) 50px, rgba(255,180,0,0.2) 150px); transform: skewX(-30deg); filter: blur(30px); animation: trafficFlow 4s linear infinite; }
         @keyframes trafficFlow { from { transform: translateX(0) skewX(-30deg); } to { transform: translateX(-50%) skewX(-30deg); } }
 
-        /* Açık / Güneşli */
-        body.mode-sun #bg-layer { background: linear-gradient(45deg, #1e3a8a 0%, #0f172a 100%); }
+        body.mode-sun #bg-layer { background: linear-gradient(45deg, #1e3a8a 0%, #1e40af 100%); }
 
         .card {
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6);
             padding: 40px 20px; border-radius: 30px;
             backdrop-filter: blur(20px);
             box-shadow: 0 15px 35px rgba(0,0,0,0.5);
@@ -40,8 +38,8 @@
             box-sizing: border-box;
         }
         .forecast-label { font-size: 0.8rem; text-transform: uppercase; color: #38bdf8; margin-bottom: 10px; letter-spacing: 1px; }
-        h1 { font-size: 3.5rem; margin: 0; text-transform: uppercase; letter-spacing: 1px; line-height: 1.1; }
-        .description { font-size: 1.5rem; margin-top: 15px; font-weight: 300; line-height: 1.4; min-height: 3em; }
+        h1 { font-size: 3.2rem; margin: 0; text-transform: uppercase; letter-spacing: 1px; line-height: 1.1; }
+        .description { font-size: 1.4rem; margin-top: 15px; font-weight: 300; line-height: 1.4; min-height: 3em; }
         
         .weather-box {
             margin-top: 25px; padding-top: 20px;
@@ -51,11 +49,24 @@
         .label { font-size: 0.75rem; text-transform: uppercase; opacity: 0.7; display: block; margin-bottom: 5px; }
         .value { font-weight: bold; color: #ffce54; font-size: 1.1rem; }
 
-        .counter { position: fixed; bottom: 20px; opacity: 0.5; transition: 0.3s; }
-        .counter:hover { opacity: 1; }
+        .counter { position: fixed; bottom: 15px; opacity: 0.4; }
 
-        @media (max-width: 600px) { h1 { font-size: 2.2rem; } .description { font-size: 1.2rem; } .weather-box { flex-wrap: wrap; } }
+        @media (max-width: 600px) { h1 { font-size: 2rem; } .description { font-size: 1.1rem; } }
     </style>
 </head>
-<body>
-    <div id="
+<body class="mode-sun"> <div id="bg-layer"></div>
+
+    <div class="card">
+        <div class="forecast-label" id="forecast-time">Veriler Alınıyor...</div>
+        <h1 id="status">Yükleniyor...</h1>
+        <p class="description" id="description">Hava durumu ve maç verileri kontrol ediliyor.</p>
+        
+        <div class="weather-box">
+            <div class="detail-item"><span class="label">Hava</span><span id="weather-text" class="value">-</span></div>
+            <div class="detail-item"><span class="label">Sıcaklık</span><span id="temp-text" class="value">-</span></div>
+            <div class="detail-item"><span class="label">Maç</span><span id="match-text" class="value">-</span></div>
+        </div>
+    </div>
+
+    <div class="counter">
+        <img src="
