@@ -31,7 +31,7 @@
             align-items: center;
             justify-content: center;
             padding: 20px;
-            overflow: hidden;
+            overflow-y: auto;
             position: relative;
         }
 
@@ -519,7 +519,7 @@ const KADIKOY_MAC_TARIHLERI = [
 
 // 8 Mart'tan itibaren Pazartesi
 function hedefGunuBul(tarih) {
-    return tarih < new Date("2026-03-08") ? 4 : 1; // 4=Perşembe, 1=Pazartesi
+    return tarih >= new Date("2026-03-08") ? 1 : 4; // 1=Pazartesi, 4=Perşembe
 }
 
 const HAVA_TURKCE = {
@@ -791,9 +791,10 @@ async function sistemiGuncelle() {
 
         if (!bugunToplantiGunuMu) {
             const gunFarki = sonrakiTopla ? Math.round((sonrakiTopla - simdi) / 86400000) : '?';
+            const sonrakiGunAdi = sonrakiTopla ? gunAdi[sonrakiTopla.getDay()] : '?';
             statusGuncelle({ 
                 tip: 'toplanti-yok', 
-                desc: `${gunAdi[hedefGun]} toplantısına ${gunFarki} gün kaldı. Şimdiki tahmine göre: ${efektifPuan >= 70 ? 'bürodayız 🟢' : efektifPuan >= 40 ? 'tartışmalı 🟡' : 'online olabiliriz 🔴'}`
+                desc: `${sonrakiGunAdi} toplantısına ${gunFarki} gün kaldı. Şimdiki tahmine göre: ${efektifPuan >= 70 ? 'bürodayız 🟢' : efektifPuan >= 40 ? 'tartışmalı 🟡' : 'online olabiliriz 🔴'}`
             });
             document.getElementById('next-meeting-info').textContent = 
                 sonrakiTopla ? `Sonraki: ${gunAdi[sonrakiTopla.getDay()]} ${sonrakiTopla.toLocaleDateString('tr-TR')}` : '';
