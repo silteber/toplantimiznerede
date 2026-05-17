@@ -3,900 +3,676 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kadıköy İlçe Toplantı Paneli</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+    <title>kadıköy ilçe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0f0f13;
-            --card: rgba(255,255,255,0.04);
-            --border: rgba(255,255,255,0.08);
-            --text: #f0ede8;
-            --muted: rgba(240,237,232,0.45);
-            --accent: #f5c842;
-            --status-green: #2ecc71;
-            --status-orange: #f39c12;
-            --status-red: #e74c3c;
-            --status-blue: #3498db;
+            --bg: #fde8de;
+            --ink: #2a0e00;
+            --ink-muted: #7a4020;
+            --ink-faint: #e0b09a;
+            --paper: #fef0eb;
+            --paper-dark: #f5ddd0;
+            --red: #d62828;
+            --green: #1a6a2a;
+            --orange: #d44000;
+            --blue: #1a3a6b;
+            --yellow: #d44000;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            font-family: 'Syne', sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg);
-            color: var(--text);
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(0,0,0,0.04) 27px, rgba(0,0,0,0.04) 28px);
+            color: var(--ink);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
-            overflow-y: auto;
-            position: relative;
+            padding: 24px 16px;
         }
 
-        /* Animated background */
-        .bg-orb {
-            position: fixed;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.12;
-            pointer-events: none;
-            transition: background 2s ease, transform 2s ease;
-            z-index: 0;
-        }
-        .bg-orb-1 { width: 500px; height: 500px; top: -100px; left: -150px; background: #3498db; animation: floatOrb1 12s ease-in-out infinite; }
-        .bg-orb-2 { width: 400px; height: 400px; bottom: -100px; right: -100px; background: #f5c842; animation: floatOrb2 15s ease-in-out infinite; }
-        .bg-orb-3 { width: 300px; height: 300px; top: 50%; left: 50%; transform: translate(-50%,-50%); background: #9b59b6; animation: floatOrb3 10s ease-in-out infinite; }
-
-        @keyframes floatOrb1 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(40px,30px) scale(1.1); } }
-        @keyframes floatOrb2 { 0%,100% { transform: translate(0,0) scale(1); } 50% { transform: translate(-30px,-40px) scale(1.05); } }
-        @keyframes floatOrb3 { 0%,100% { transform: translate(-50%,-50%) scale(1); } 50% { transform: translate(-50%,-50%) scale(1.2); } }
-
-        .main-card {
-            position: relative;
-            z-index: 1;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 40px 36px;
+        .newspaper {
             width: 100%;
-            max-width: 620px;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            animation: cardIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+            max-width: 580px;
+            background: var(--paper);
+            border: 2px solid var(--ink);
+            box-shadow: 5px 5px 0 var(--ink);
+            animation: slideIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        @keyframes slideIn {
+            from { opacity:0; transform:translateY(16px); }
+            to   { opacity:1; transform:translateY(0); }
         }
 
-        @keyframes cardIn {
-            from { opacity: 0; transform: translateY(24px) scale(0.97); }
-            to   { opacity: 1; transform: translateY(0) scale(1); }
-        }
-
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 32px;
-        }
-        .header-title {
-            font-size: 0.7rem;
-            font-family: 'Space Mono', monospace;
-            letter-spacing: 0.15em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-        .header-title strong { color: var(--accent); display: block; font-size: 0.9rem; margin-top: 2px; }
-
-        .worker-badge {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.65rem;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid var(--border);
-            border-radius: 100px;
-            padding: 6px 14px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: default;
-            position: relative;
-        }
-        .worker-dot {
-            width: 7px; height: 7px;
-            border-radius: 50%;
-            background: var(--status-green);
-            box-shadow: 0 0 8px var(--status-green);
-            animation: pulse 2s ease-in-out infinite;
-        }
-        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
-        .worker-badge:hover .worker-tooltip { opacity: 1; pointer-events: auto; transform: translateY(0); }
-        .worker-tooltip {
-            position: absolute;
-            top: calc(100% + 10px);
-            right: 0;
-            background: #1a1a24;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 10px 14px;
-            font-size: 0.7rem;
-            white-space: nowrap;
-            opacity: 0;
-            pointer-events: none;
-            transform: translateY(-5px);
-            transition: all 0.2s ease;
-            color: var(--muted);
-            line-height: 1.7;
-            z-index: 10;
-        }
-        .worker-tooltip strong { color: var(--text); }
-
-        /* Status block */
-        .status-section { margin-bottom: 28px; }
-
-        .context-label {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.65rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .context-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 100px;
-            padding: 8px 20px 8px 10px;
-            margin-bottom: 16px;
-            animation: fadeSlideIn 0.5s ease both;
-        }
-        .status-indicator {
-            width: 10px; height: 10px;
-            border-radius: 50%;
-            animation: pulse 2s ease-in-out infinite;
-        }
-        .status-pill-text {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.7rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-
-        #main-status {
-            font-size: 3.2rem;
-            font-weight: 800;
-            line-height: 1;
-            letter-spacing: -0.02em;
-            margin-bottom: 14px;
-            animation: fadeSlideIn 0.6s 0.1s ease both;
-        }
-        @keyframes fadeSlideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        #main-desc {
-            font-size: 1.05rem;
-            font-weight: 400;
-            color: var(--muted);
-            line-height: 1.6;
-            min-height: 2.5em;
-            animation: fadeSlideIn 0.6s 0.2s ease both;
-        }
-
-        /* Score meter */
-        .score-section {
-            margin: 24px 0;
-            animation: fadeSlideIn 0.6s 0.3s ease both;
-        }
-        .score-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 10px;
-        }
-        .score-label {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.65rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-            color: var(--muted);
-        }
-        .score-value {
-            font-family: 'Space Mono', monospace;
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: var(--accent);
-        }
-        .score-bar-bg {
-            height: 6px;
-            background: rgba(255,255,255,0.08);
-            border-radius: 100px;
-            overflow: hidden;
-        }
-        .score-bar-fill {
-            height: 100%;
-            border-radius: 100px;
-            transition: width 1.2s cubic-bezier(0.22, 1, 0.36, 1), background 1s ease;
-            width: 0%;
-        }
-        .score-ticks {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 6px;
-        }
-        .score-tick {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.55rem;
-            color: rgba(255,255,255,0.2);
-        }
-        .score-tick.active { color: var(--accent); }
-
-        /* Details grid */
-        .details-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            animation: fadeSlideIn 0.6s 0.4s ease both;
-        }
-        .detail-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 14px 12px;
+        /* Masthead */
+        .masthead {
+            border-bottom: 3px double var(--ink);
+            padding: 16px 20px 12px;
             text-align: center;
-            transition: background 0.2s;
         }
-        .detail-card:hover { background: rgba(255,255,255,0.07); }
-        .detail-icon { font-size: 1.3rem; margin-bottom: 6px; display: block; }
-        .detail-label {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.55rem;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--muted);
-            display: block;
-            margin-bottom: 5px;
-        }
-        .detail-value {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--accent);
-        }
-        .detail-sub {
-            font-size: 0.6rem;
-            color: var(--muted);
-            margin-top: 3px;
-            display: block;
-            font-family: 'Space Mono', monospace;
-        }
-
-        /* Footer */
-        .footer {
-            margin-top: 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            animation: fadeSlideIn 0.6s 0.5s ease both;
-        }
-        .last-update {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.6rem;
-            color: rgba(255,255,255,0.2);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .update-dot {
-            width: 5px; height: 5px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.25);
-        }
-        .update-dot.refreshing { background: var(--accent); animation: pulse 0.5s ease-in-out 3; }
-
-        .next-meeting {
-            font-family: 'Space Mono', monospace;
-            font-size: 0.6rem;
-            color: rgba(255,255,255,0.2);
-            text-align: right;
-        }
-
-        /* Weather particles */
-        .particle-container {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
-        .raindrop {
-            position: absolute;
-            width: 2px;
-            background: linear-gradient(transparent, rgba(100,160,255,0.6));
-            border-radius: 2px;
-            animation: fall linear infinite;
-            opacity: 0;
-        }
-        @keyframes fall {
-            0%   { transform: translateY(-20px); opacity: 0; }
-            10%  { opacity: 1; }
-            90%  { opacity: 1; }
-            100% { transform: translateY(100vh); opacity: 0; }
-        }
-        .snowflake {
-            position: absolute;
-            color: rgba(255,255,255,0.5);
-            font-size: 14px;
-            animation: snowfall linear infinite;
-        }
-        @keyframes snowfall {
-            0%   { transform: translateY(-20px) rotate(0deg); opacity: 0; }
-            10%  { opacity: 1; }
-            90%  { opacity: 1; }
-            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
-        }
-        .sunray {
-            position: fixed;
-            top: -50px; left: 50%;
-            transform: translateX(-50%);
-            width: 3px;
-            height: 200px;
-            background: linear-gradient(rgba(255,220,50,0.15), transparent);
-            transform-origin: top center;
-            animation: sunRotate 8s linear infinite;
-            pointer-events: none;
-            z-index: 0;
-        }
-        @keyframes sunRotate { from { transform: translateX(-50%) rotate(0deg); } to { transform: translateX(-50%) rotate(360deg); } }
-
-        /* Gazete popup */
-        .gazete-card {
-            background: rgba(255,255,255,0.04);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 14px 16px;
-            margin-top: 12px;
-            cursor: pointer;
-            transition: background 0.2s;
-            animation: fadeSlideIn 0.6s 0.55s ease both;
-            text-decoration: none;
-            display: block;
-        }
-        .gazete-card:hover { background: rgba(255,255,255,0.07); }
-        .gazete-card-header {
+        .masthead-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
         }
-        .gazete-label {
+        .masthead-date {
             font-family: 'Space Mono', monospace;
-            font-size: 0.55rem;
-            letter-spacing: 0.12em;
+            font-size: 0.58rem;
+            color: var(--ink-muted);
             text-transform: uppercase;
-            color: var(--accent);
+            letter-spacing: 0.08em;
         }
-        .gazete-refresh {
-            font-size: 0.65rem;
-            color: var(--muted);
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 2px 6px;
-            border-radius: 6px;
-            transition: background 0.2s, transform 0.3s;
+        .masthead-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            line-height: 1;
         }
-        .gazete-refresh:hover { background: rgba(255,255,255,0.08); transform: rotate(180deg); }
-        .gazete-title {
-            font-size: 0.85rem;
-            font-weight: 700;
-            line-height: 1.45;
-            color: var(--text);
-            margin-bottom: 6px;
-        }
-        .gazete-meta {
+        .masthead-sub {
             font-family: 'Space Mono', monospace;
-            font-size: 0.55rem;
-            color: var(--muted);
+            font-size: 0.58rem;
+            color: var(--ink-muted);
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+        .masthead-rule { height:1px; background:var(--ink); margin-top:10px; }
+
+        /* Ticker */
+        .ticker {
+            background: var(--ink);
+            color: var(--paper);
+            padding: 5px 20px;
+            font-family: 'Space Mono', monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.08em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .ticker-dot {
+            display: inline-block;
+            width:6px; height:6px;
+            border-radius:50%;
+            background: #f5c842;
+            margin-right: 6px;
+            vertical-align: middle;
+            animation: blink 1.5s ease-in-out infinite;
+        }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.25} }
+
+        /* Content */
+        .content { padding: 20px 20px 16px; }
+
+        /* Headline block */
+        .headline-block {
+            border-bottom: 2px solid var(--ink);
+            padding-bottom: 16px;
+            margin-bottom: 0;
+        }
+        .kicker {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.58rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--orange);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .kicker::after { content:''; flex:1; height:1px; background:var(--orange); opacity:0.25; }
+
+        .headline {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 900;
+            line-height: 1.0;
+            letter-spacing: -0.02em;
+            margin-bottom: 10px;
+            transition: color 0.4s;
+        }
+        .headline.durum-burodayiz  { color: var(--green); }
+        .headline.durum-tartismali { color: var(--orange); }
+        .headline.durum-online     { color: var(--red); }
+        .headline.durum-yok        { color: var(--blue); }
+
+        .deck {
+            font-size: 0.95rem;
+            color: var(--ink-muted);
+            line-height: 1.55;
+            border-left: 3px solid var(--ink-faint);
+            padding-left: 12px;
+            min-height: 2.2em;
+        }
+
+        .score-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .score-lbl {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.58rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--ink-muted);
+            white-space: nowrap;
+        }
+        .score-bar-wrap {
+            flex:1;
+            height: 7px;
+            background: var(--paper-dark);
+            border: 1px solid var(--ink-faint);
+            overflow: hidden;
+        }
+        .score-bar-inner {
+            height: 100%;
+            width: 0%;
+            transition: width 1.2s cubic-bezier(0.22,1,0.36,1), background 0.8s;
+        }
+        .score-num {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        /* Columns */
+        .columns {
+            display: grid;
+            grid-template-columns: repeat(3,1fr);
+            border-top: 1px solid var(--ink-faint);
+            border-bottom: 2px solid var(--ink);
+        }
+        .col-item {
+            padding: 12px 8px;
+            border-right: 1px solid var(--ink-faint);
+            text-align: center;
+        }
+        .col-item:last-child { border-right: none; }
+        .col-label {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.53rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--ink-muted);
+            display: block;
+            margin-bottom: 4px;
+        }
+        .col-icon { font-size: 1.2rem; display: block; margin-bottom: 3px; }
+        .col-val {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: block;
+        }
+        .col-sub {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.52rem;
+            color: var(--ink-muted);
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* Gazete */
+        .gazete-section {
+            border-top: 1px solid var(--ink-faint);
+            padding: 14px 0 0;
+        }
+        .gazete-kicker {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.58rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--ink-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .gazete-btn {
+            background: none;
+            border: 1px solid var(--ink-faint);
+            cursor: pointer;
+            padding: 3px 10px;
+            font-size: 0.65rem;
+            font-family: 'Space Mono', monospace;
+            color: var(--ink-muted);
+            transition: all 0.15s;
+            display: inline-block;
+        }
+        .gazete-btn:hover { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+        .gazete-btn.spinning { animation: spinOnce 0.5s ease; }
+        @keyframes spinOnce { 0%{transform:rotate(0)} 100%{transform:rotate(360deg)} }
+
+        .gazete-link { display:block; text-decoration:none; color:inherit; }
+        .gazete-link:hover .gazete-title-txt { text-decoration: underline; }
+        .gazete-title-txt {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.4;
+            color: var(--ink);
+            margin-bottom: 4px;
+            display: block;
+        }
+        .gazete-src {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.52rem;
+            color: var(--ink-muted);
         }
         .gazete-loading {
             font-family: 'Space Mono', monospace;
-            font-size: 0.7rem;
-            color: var(--muted);
-            text-align: center;
-            padding: 4px 0;
+            font-size: 0.62rem;
+            color: var(--ink-muted);
         }
-            .main-card { padding: 28px 20px; }
-            #main-status { font-size: 2.2rem; }
-            .details-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
-            .detail-card { padding: 10px 6px; }
-            .detail-value { font-size: 0.8rem; }
+
+        /* Footer */
+        .footer-bar {
+            background: var(--paper-dark);
+            border-top: 2px solid var(--ink);
+            padding: 8px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .footer-txt {
+            font-family: 'Space Mono', monospace;
+            font-size: 0.52rem;
+            color: var(--ink-muted);
+        }
+        .live-dot {
+            display: inline-block;
+            width:5px; height:5px;
+            border-radius:50%;
+            background: var(--ink-faint);
+            margin-right:5px;
+            vertical-align: middle;
+            transition: background 0.3s;
+        }
+        .live-dot.on { background:var(--green); box-shadow: 0 0 5px var(--green); }
+
+        /* Particles */
+        .particle-container {
+            position:fixed; top:0; left:0;
+            width:100%; height:100%;
+            pointer-events:none; z-index:0; overflow:hidden;
+        }
+        .raindrop {
+            position:absolute; width:1px;
+            background:linear-gradient(transparent, rgba(26,50,100,0.35));
+            animation:fall linear infinite; opacity:0;
+        }
+        @keyframes fall {
+            0%{transform:translateY(-20px);opacity:0} 10%{opacity:1}
+            90%{opacity:1} 100%{transform:translateY(100vh);opacity:0}
+        }
+        .snowflake {
+            position:absolute; color:rgba(26,50,100,0.3); font-size:12px;
+            animation:snowfall linear infinite;
+        }
+        @keyframes snowfall {
+            0%{transform:translateY(-20px) rotate(0deg);opacity:0} 10%{opacity:1}
+            90%{opacity:1} 100%{transform:translateY(100vh) rotate(360deg);opacity:0}
+        }
+
+        @media (max-width: 480px) {
+            .masthead-name { font-size:1.6rem; }
+            .headline { font-size:2rem; }
+            .content { padding:14px 14px 12px; }
+            .footer-bar { padding:7px 14px; }
+            .col-val { font-size:0.95rem; }
         }
     </style>
 </head>
 <body>
 
 <div class="particle-container" id="particles"></div>
-<div class="bg-orb bg-orb-1" id="orb1"></div>
-<div class="bg-orb bg-orb-2" id="orb2"></div>
-<div class="bg-orb bg-orb-3" id="orb3"></div>
 
-<div class="main-card">
-    <div class="header">
-        <div class="header-title">
-            Toplantı Durumu
-            <strong>Kadıköy İlçe</strong>
+<div class="newspaper">
+
+    <div class="masthead">
+        <div class="masthead-top">
+            <span class="masthead-date" id="bugun-tarih">—</span>
+            <span class="masthead-date">istanbul, türkiye</span>
         </div>
-        <div class="worker-badge">
-            <span class="worker-dot"></span>
-            <span>işsiz veya öğrenci aidatı vermeyen kişi sayısı: <strong style="color:var(--accent)">2</strong></span>
-        </div>
+        <div class="masthead-name">kadıköy ilçe</div>
+        <div class="masthead-sub">toplantı durum bülteni</div>
+        <div class="masthead-rule"></div>
     </div>
 
-    <div class="status-section">
-        <div class="context-label" id="context-label">bu hafta</div>
-        <div class="status-pill" id="status-pill">
-            <span class="status-indicator" id="status-indicator" style="background:#666"></span>
-            <span class="status-pill-text" id="status-pill-text">Yükleniyor</span>
-        </div>
-        <div id="main-status">—</div>
-        <div id="main-desc">Veriler çekiliyor...</div>
+    <div class="ticker">
+        <span><span class="ticker-dot"></span><span id="ticker-text">yükleniyor...</span></span>
+        <span id="ticker-right">—</span>
     </div>
 
-    <div class="score-section" id="score-section">
-        <div class="score-header">
-            <span class="score-label">Büro Skoru</span>
-            <span class="score-value" id="score-display">—</span>
+    <div class="content">
+
+        <div class="headline-block">
+            <div class="kicker" id="kicker-text">bu hafta</div>
+            <div class="headline" id="main-headline">yükleniyor...</div>
+            <div class="deck" id="main-deck">veriler çekiliyor...</div>
+            <div class="score-row">
+                <span class="score-lbl">büro skoru</span>
+                <div class="score-bar-wrap">
+                    <div class="score-bar-inner" id="score-bar"></div>
+                </div>
+                <span class="score-num" id="score-num">—</span>
+            </div>
         </div>
-        <div class="score-bar-bg">
-            <div class="score-bar-fill" id="score-bar"></div>
+
+        <div class="columns">
+            <div class="col-item">
+                <span class="col-icon" id="hava-icon">🌡️</span>
+                <span class="col-label">hava</span>
+                <span class="col-val" id="hava-val">—</span>
+                <span class="col-sub" id="hava-sub"></span>
+            </div>
+            <div class="col-item">
+                <span class="col-icon">🌡️</span>
+                <span class="col-label">sıcaklık</span>
+                <span class="col-val" id="derece-val">—</span>
+                <span class="col-sub" id="derece-sub"></span>
+            </div>
+            <div class="col-item">
+                <span class="col-icon">⚽</span>
+                <span class="col-label">kadıköy maçı</span>
+                <span class="col-val" id="mac-val">—</span>
+                <span class="col-sub">lig bitti şükür</span>
+            </div>
         </div>
-        <div class="score-ticks">
-            <span class="score-tick">Online</span>
-            <span class="score-tick">Tartışmalı</span>
-            <span class="score-tick">Büro</span>
+
+        <div class="gazete-section">
+            <div class="gazete-kicker">
+                <span>📰 günün yazısı — gazete nisan</span>
+                <button class="gazete-btn" id="gazete-btn" onclick="gazeteyiYukle()">↻ başka</button>
+            </div>
+            <div id="gazete-icerik">
+                <div class="gazete-loading">yazı aranıyor...</div>
+            </div>
         </div>
+
     </div>
 
-    <div class="details-grid">
-        <div class="detail-card">
-            <span class="detail-icon" id="weather-icon">🌡️</span>
-            <span class="detail-label">Hava</span>
-            <span class="detail-value" id="weather-text">—</span>
-            <span class="detail-sub" id="weather-sub"></span>
+    <div class="footer-bar">
+        <div class="footer-txt">
+            <span class="live-dot" id="live-dot"></span>
+            <span id="update-text">güncelleniyor...</span>
         </div>
-        <div class="detail-card">
-            <span class="detail-icon">🌡️</span>
-            <span class="detail-label">Sıcaklık</span>
-            <span class="detail-value" id="temp-text">—</span>
-            <span class="detail-sub" id="temp-sub"></span>
-        </div>
-        <div class="detail-card">
-            <span class="detail-icon">⚽</span>
-            <span class="detail-label">Kadıköy Maçı</span>
-            <span class="detail-value" id="match-text">—</span>
-            <span class="detail-sub" id="match-sub"></span>
-        </div>
+        <div class="footer-txt" id="next-info"></div>
     </div>
 
-    <div class="footer">
-        <div class="last-update">
-            <span class="update-dot" id="update-dot"></span>
-            <span id="last-update-text">güncelleniyor...</span>
-        </div>
-        <div class="next-meeting" id="next-meeting-info"></div>
-    </div>
-
-    <a id="gazete-card" class="gazete-card" href="#" target="_blank">
-        <div class="gazete-card-header">
-            <span class="gazete-label">📰 günün yazısı</span>
-            <button class="gazete-refresh" onclick="event.preventDefault(); gazeteyiYukle()" title="Başka yazı">↻</button>
-        </div>
-        <div id="gazete-icerik">
-            <div class="gazete-loading">yükleniyor...</div>
-        </div>
-    </a>
 </div>
 
 <script>
-// ⚠️ NOT: Bu API key'ini GitHub veya başka herkese açık bir yere yükleme!
-// Sadece kendi bilgisayarında veya güvendiğin kişilerle paylaş.
 const API_KEY = '613219e556123f0b9188976e6fc6e418';
 
-const KADIKOY_MAC_TARIHLERI = [
+const MAC_TARIHLERI = [
     "2026-02-05","2026-02-09","2026-02-22",
     "2026-03-08","2026-03-18","2026-04-05","2026-04-19"
 ];
 
-// 8 Mart'tan itibaren Pazartesi
-function hedefGunuBul(tarih) {
-    return tarih >= new Date("2026-03-08") ? 1 : 4; // 1=Pazartesi, 4=Perşembe
+const HAVA_TR  = { Clear:'güneşli', Clouds:'bulutlu', Rain:'yağışlı', Drizzle:'çiseleme', Thunderstorm:'fırtına', Snow:'karlı', Mist:'sisli', Fog:'yoğun sis', Haze:'puslu' };
+const HAVA_ICO = { Clear:'☀️', Clouds:'☁️', Rain:'🌧️', Drizzle:'🌦️', Thunderstorm:'⛈️', Snow:'❄️', Mist:'🌫️', Fog:'🌫️', Haze:'🌫️' };
+const GUN_ADI  = ['pazar','pazartesi','salı','çarşamba','perşembe','cuma','cumartesi'];
+
+function hedefGun(tarih) {
+    return tarih >= new Date("2026-03-08") ? 1 : 4;
 }
 
-const HAVA_TURKCE = {
-    'Clear':'Güneşli','Clouds':'Bulutlu','Rain':'Yağışlı',
-    'Drizzle':'Çiseleme','Thunderstorm':'Fırtına','Snow':'Karlı',
-    'Mist':'Sisli','Fog':'Yoğun Sis','Haze':'Puslu','Dust':'Tozlu'
-};
-const HAVA_ICON = {
-    'Clear':'☀️','Clouds':'☁️','Rain':'🌧️',
-    'Drizzle':'🌦️','Thunderstorm':'⛈️','Snow':'❄️',
-    'Mist':'🌫️','Fog':'🌫️','Haze':'🌫️'
-};
-
-// Büro skoru hesaplama: 0=kesin online, 100=kesin büro
-function buroPuanHesapla(havaMain, derece, yagisYogunlugu) {
-    let puan = 100; // başlangıç: büro
-    
-    // Sıcaklık etkisi
-    if (derece < -5)       puan -= 40; // dondurucu soğuk
-    else if (derece < 0)   puan -= 25;
-    else if (derece < 5)   puan -= 10;
-    else if (derece > 38)  puan -= 20; // kavurucu sıcak
-    else if (derece > 33)  puan -= 10;
-
-    // Hava durumu etkisi
-    if (havaMain === 'Thunderstorm')   puan -= 50;
-    else if (havaMain === 'Snow')       puan -= 35;
-    else if (havaMain === 'Rain') {
-        if (yagisYogunlugu > 5)         puan -= 40; // şiddetli yağmur
-        else if (yagisYogunlugu > 2)    puan -= 25; // orta yağmur
-        else                             puan -= 15; // hafif yağmur
-    }
-    else if (havaMain === 'Drizzle')    puan -= 10;
-    else if (havaMain === 'Fog')        puan -= 15;
-
-    return Math.max(0, Math.min(100, puan));
-}
-
-// Önümüzdeki toplantı gününü bul
-function sonrakiToplantiGunu(simdi) {
+function sonrakiTopla(simdi) {
     const d = new Date(simdi);
     for (let i = 1; i <= 14; i++) {
         d.setDate(d.getDate() + 1);
-        const hg = hedefGunuBul(d);
-        if (d.getDay() === hg) return new Date(d);
+        if (d.getDay() === hedefGun(d)) return new Date(d);
     }
     return null;
 }
 
-// Forecast verisinden belirli bir tarih için 17-22 arası ortalama çek
-function forecastFiltrele(list, hedefTarih) {
-    const hedefStr = hedefTarih.toLocaleDateString('en-CA');
-    const filtrelenmis = list.filter(item => {
-        const d = new Date(item.dt * 1000);
-        const saat = d.getHours();
-        const tarih = d.toLocaleDateString('en-CA');
-        return tarih === hedefStr && saat >= 17 && saat <= 22;
-    });
-    if (!filtrelenmis.length) return null;
-    
-    const topDerece = filtrelenmis.reduce((s,i) => s + i.main.temp, 0);
-    const topYagis  = filtrelenmis.reduce((s,i) => s + (i.rain ? (i.rain['3h'] || 0) : 0), 0);
-    const agirlikliHava = filtrelenmis
-        .map(i => i.weather[0].main)
-        .sort((a,b) =>
-            filtrelenmis.filter(x=>x.weather[0].main===b).length -
-            filtrelenmis.filter(x=>x.weather[0].main===a).length
-        )[0];
-    
-    return {
-        temp: Math.round(topDerece / filtrelenmis.length),
-        main: agirlikliHava,
-        rain: topYagis,
-        count: filtrelenmis.length
-    };
+function buroPuani(main, derece, yagis) {
+    let p = 100;
+    if (derece < -5) p -= 40; else if (derece < 0) p -= 25; else if (derece < 5) p -= 10;
+    else if (derece > 38) p -= 20; else if (derece > 33) p -= 10;
+    if (main === 'Thunderstorm') p -= 50;
+    else if (main === 'Snow') p -= 35;
+    else if (main === 'Rain') { p -= yagis > 5 ? 40 : yagis > 2 ? 25 : 15; }
+    else if (main === 'Drizzle') p -= 10;
+    else if (main === 'Fog') p -= 15;
+    return Math.max(0, Math.min(100, p));
 }
 
-// Parçacık animasyonları
-function animasyonOlustur(tip) {
-    const container = document.getElementById('particles');
-    container.innerHTML = '';
-    
+function forecastFiltrele(list, hedefTarih) {
+    const str = hedefTarih.toLocaleDateString('en-CA');
+    const f   = list.filter(i => {
+        const d = new Date(i.dt * 1000);
+        return d.toLocaleDateString('en-CA') === str && d.getHours() >= 17 && d.getHours() <= 22;
+    });
+    if (!f.length) return null;
+    const derece = Math.round(f.reduce((s,i) => s + i.main.temp, 0) / f.length);
+    const yagis  = f.reduce((s,i) => s + (i.rain ? (i.rain['3h'] || 0) : 0), 0);
+    const main   = f.map(i => i.weather[0].main)
+        .sort((a,b) => f.filter(x=>x.weather[0].main===b).length - f.filter(x=>x.weather[0].main===a).length)[0];
+    return { derece, yagis, main };
+}
+
+function jsonp(url) {
+    return new Promise((res, rej) => {
+        const cb = 'owm_' + Date.now();
+        const s  = document.createElement('script');
+        const t  = setTimeout(() => { delete window[cb]; s.remove(); rej(new Error('timeout')); }, 8000);
+        window[cb] = d => { clearTimeout(t); delete window[cb]; s.remove(); res(d); };
+        s.src = url + '&callback=' + cb;
+        s.onerror = () => { clearTimeout(t); rej(new Error('error')); };
+        document.head.appendChild(s);
+    });
+}
+
+function animasyonYap(tip) {
+    const c = document.getElementById('particles');
+    c.innerHTML = '';
     if (tip === 'rain') {
-        for (let i = 0; i < 60; i++) {
-            const drop = document.createElement('div');
-            drop.className = 'raindrop';
-            drop.style.cssText = `
-                left: ${Math.random() * 100}%;
-                height: ${Math.random() * 20 + 10}px;
-                animation-duration: ${Math.random() * 0.8 + 0.6}s;
-                animation-delay: ${Math.random() * 2}s;
-            `;
-            container.appendChild(drop);
+        for (let i = 0; i < 50; i++) {
+            const d = document.createElement('div');
+            d.className = 'raindrop';
+            d.style.cssText = `left:${Math.random()*100}%;height:${Math.random()*14+8}px;animation-duration:${Math.random()*0.6+0.5}s;animation-delay:${Math.random()*2}s;`;
+            c.appendChild(d);
         }
     } else if (tip === 'snow') {
-        for (let i = 0; i < 40; i++) {
-            const flake = document.createElement('div');
-            flake.className = 'snowflake';
-            flake.textContent = '❄';
-            flake.style.cssText = `
-                left: ${Math.random() * 100}%;
-                font-size: ${Math.random() * 10 + 8}px;
-                animation-duration: ${Math.random() * 3 + 3}s;
-                animation-delay: ${Math.random() * 4}s;
-            `;
-            container.appendChild(flake);
-        }
-    } else if (tip === 'sun') {
-        for (let i = 0; i < 12; i++) {
-            const ray = document.createElement('div');
-            ray.className = 'sunray';
-            ray.style.cssText = `
-                animation-delay: ${i * (8/12)}s;
-                transform: translateX(-50%) rotate(${i * 30}deg);
-                opacity: ${Math.random() * 0.5 + 0.2};
-            `;
-            container.appendChild(ray);
+        for (let i = 0; i < 35; i++) {
+            const f = document.createElement('div');
+            f.className = 'snowflake'; f.textContent = '❄';
+            f.style.cssText = `left:${Math.random()*100}%;font-size:${Math.random()*8+7}px;animation-duration:${Math.random()*3+3}s;animation-delay:${Math.random()*4}s;`;
+            c.appendChild(f);
         }
     }
 }
 
-// Arkaplan rengi + orb güncelle
-function arkaPlanRengiAyarla(puan, macVar) {
-    const orb1 = document.getElementById('orb1');
-    const orb2 = document.getElementById('orb2');
-    
-    if (puan >= 70) {
-        orb1.style.background = '#27ae60';
-        orb2.style.background = '#2ecc71';
-    } else if (puan >= 40) {
-        orb1.style.background = '#e67e22';
-        orb2.style.background = '#f39c12';
-    } else {
-        orb1.style.background = '#c0392b';
-        orb2.style.background = '#e74c3c';
-    }
-    if (macVar) {
-        document.getElementById('orb3').style.background = '#e74c3c';
-    }
-}
-
-function statusGuncelle(durum) {
-    const pill = document.getElementById('status-pill');
-    const pillText = document.getElementById('status-pill-text');
-    const indicator = document.getElementById('status-indicator');
-    const mainStatus = document.getElementById('main-status');
-    const mainDesc = document.getElementById('main-desc');
-
-    const renkler = {
-        'burodayiz':  { color: '#2ecc71', pill: 'BÜRO GÜNÜ', status: 'BÜRODAYIZ',       desc: "19:30'da görüşürüz — önden gelen çay kahve demlesin." },
-        'tartismali': { color: '#f39c12', pill: 'BELİRSİZ',  status: 'TARTIŞMALI',       desc: '' },
-        'online':     { color: '#e74c3c', pill: 'ONLINE',    status: 'ONLINE OLABİLİR', desc: '' },
-        'toplanti-yok': { color: '#3498db', pill: 'TOPLANTI YOK', status: 'Bugün toplantı yok.', desc: '' },
-    };
-    const r = renkler[durum.tip];
-    indicator.style.background = r.color;
-    indicator.style.boxShadow = `0 0 8px ${r.color}`;
-    pillText.textContent = r.pill;
-    mainStatus.textContent = r.status;
-    if (r.desc) mainDesc.textContent = r.desc;
-    if (durum.desc) mainDesc.textContent = durum.desc;
-}
-
-function scoreGoster(puan, macVar) {
-    const efektifPuan = macVar ? Math.min(puan, 55) : puan;
-    const bar = document.getElementById('score-bar');
-    const display = document.getElementById('score-display');
-
-    let renk;
-    if (efektifPuan >= 70)      renk = 'linear-gradient(90deg, #27ae60, #2ecc71)';
-    else if (efektifPuan >= 40)  renk = 'linear-gradient(90deg, #e67e22, #f39c12)';
-    else                         renk = 'linear-gradient(90deg, #c0392b, #e74c3c)';
-
+function scoreGoster(puan) {
+    const renk = puan >= 70 ? '#2d6a2d' : puan >= 40 ? '#c44b00' : '#d62828';
     setTimeout(() => {
-        bar.style.width = efektifPuan + '%';
-        bar.style.background = renk;
-    }, 400);
-
-    display.textContent = efektifPuan + '/100';
-    if (macVar && puan > 55) {
-        display.title = `Hava skoru ${puan}, ama maç var → ${efektifPuan}`;
-    }
-}
-
-// JSONP yardımcısı — file:// protokolünde fetch çalışmadığı için
-function jsonpIste(url) {
-    return new Promise((resolve, reject) => {
-        const cbName = 'owm_cb_' + Date.now();
-        const script = document.createElement('script');
-        const timeout = setTimeout(() => {
-            delete window[cbName];
-            script.remove();
-            reject(new Error('JSONP timeout'));
-        }, 8000);
-        window[cbName] = (data) => {
-            clearTimeout(timeout);
-            delete window[cbName];
-            script.remove();
-            resolve(data);
-        };
-        script.src = url + '&callback=' + cbName;
-        script.onerror = () => { clearTimeout(timeout); reject(new Error('Script error')); };
-        document.head.appendChild(script);
-    });
+        document.getElementById('score-bar').style.width = puan + '%';
+        document.getElementById('score-bar').style.background = renk;
+    }, 300);
+    const n = document.getElementById('score-num');
+    n.textContent = puan + '/100';
+    n.style.color = renk;
 }
 
 async function sistemiGuncelle() {
-    const simdi = new Date();
+    const simdi    = new Date();
     const bugunISO = simdi.toLocaleDateString('en-CA');
-    const hedefGun = hedefGunuBul(simdi);
-    const bugunToplantiGunuMu = simdi.getDay() === hedefGun;
-    
-    // Sonraki toplantı günü
-    const sonrakiTopla = sonrakiToplantiGunu(simdi);
-    const sonrakiISO = sonrakiTopla ? sonrakiTopla.toLocaleDateString('en-CA') : null;
-    
-    const gunAdi = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+    const hg       = hedefGun(simdi);
+    const bugunMu  = simdi.getDay() === hg;
+    const sonraki  = sonrakiTopla(simdi);
+    const sonrakiISO = sonraki ? sonraki.toLocaleDateString('en-CA') : null;
+
+    document.getElementById('bugun-tarih').textContent =
+        simdi.toLocaleDateString('tr-TR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
 
     try {
-        let havaMain, derece, yagis, kaynakTarih;
+        let main, derece, yagis, kaynak;
 
-        if (bugunToplantiGunuMu) {
-            // Bugün toplantı günü — anlık hava
-            const data = await jsonpIste(`https://api.openweathermap.org/data/2.5/weather?q=Istanbul&appid=${API_KEY}&units=metric`);
-            havaMain = data.weather[0].main;
-            derece   = Math.round(data.main.temp);
-            yagis    = data.rain ? (data.rain['1h'] || 0) : 0;
-            kaynakTarih = 'anlık';
-            document.getElementById('context-label').textContent = 'bu gün — toplantı günü';
+        if (bugunMu) {
+            const d = await jsonp(`https://api.openweathermap.org/data/2.5/weather?q=Istanbul&appid=${API_KEY}&units=metric`);
+            main = d.weather[0].main; derece = Math.round(d.main.temp);
+            yagis = d.rain ? (d.rain['1h'] || 0) : 0; kaynak = 'anlık';
+            document.getElementById('kicker-text').textContent = 'bugünkü durum';
         } else {
-            // Toplantı günü değil — forecast'tan toplantı günü tahminini çek
-            const data = await jsonpIste(`https://api.openweathermap.org/data/2.5/forecast?q=Istanbul&appid=${API_KEY}&units=metric`);
-            const tahmin = forecastFiltrele(data.list, sonrakiTopla);
-            
-            if (tahmin) {
-                havaMain = tahmin.main;
-                derece   = tahmin.temp;
-                yagis    = tahmin.rain;
-                kaynakTarih = 'tahmin';
-                document.getElementById('context-label').textContent = `${gunAdi[sonrakiTopla.getDay()]} için tahmin (17-22)`;
+            const d = await jsonp(`https://api.openweathermap.org/data/2.5/forecast?q=Istanbul&appid=${API_KEY}&units=metric`);
+            const t = forecastFiltrele(d.list, sonraki);
+            if (t) {
+                main = t.main; derece = t.derece; yagis = t.yagis; kaynak = 'tahmin';
+                document.getElementById('kicker-text').textContent =
+                    `${GUN_ADI[sonraki.getDay()]} için tahmin (17-22)`;
             } else {
-                // Forecast erişilemedi, anlık ver
-                const data2 = await jsonpIste(`https://api.openweathermap.org/data/2.5/weather?q=Istanbul&appid=${API_KEY}&units=metric`);
-                havaMain = data2.weather[0].main;
-                derece   = Math.round(data2.main.temp);
-                yagis    = data2.rain ? (data2.rain['1h'] || 0) : 0;
-                kaynakTarih = 'anlık (tahmin yok)';
-                document.getElementById('context-label').textContent = 'anlık hava (tahmin mevcut değil)';
+                const d2 = await jsonp(`https://api.openweathermap.org/data/2.5/weather?q=Istanbul&appid=${API_KEY}&units=metric`);
+                main = d2.weather[0].main; derece = Math.round(d2.main.temp);
+                yagis = d2.rain ? (d2.rain['1h'] || 0) : 0; kaynak = 'anlık';
+                document.getElementById('kicker-text').textContent = 'anlık hava';
             }
         }
 
-        const hedefISO = bugunToplantiGunuMu ? bugunISO : sonrakiISO;
-        const macVar = KADIKOY_MAC_TARIHLERI.includes(hedefISO);
-        const puan   = buroPuanHesapla(havaMain, derece, yagis);
+        const hedefISO = bugunMu ? bugunISO : sonrakiISO;
+        const macVar   = MAC_TARIHLERI.includes(hedefISO);
+        const puan     = buroPuani(main, derece, yagis);
+        const efektif  = macVar ? Math.min(puan, 55) : puan;
 
-        // UI güncelle
-        document.getElementById('weather-icon').textContent = HAVA_ICON[havaMain] || '🌡️';
-        document.getElementById('weather-text').textContent = HAVA_TURKCE[havaMain] || havaMain;
-        document.getElementById('weather-sub').textContent  = kaynakTarih === 'tahmin' ? '5g tahmin' : 'anlık';
-        document.getElementById('temp-text').textContent    = derece + '°C';
-        document.getElementById('temp-sub').textContent     = derece < 5 ? 'soğuk!' : derece > 32 ? 'sıcak!' : 'normal';
-        document.getElementById('match-text').textContent   = macVar ? 'VAR ⚠️' : 'YOK';
-        document.getElementById('match-sub').textContent    = macVar ? 'Kadıköy kalabalık' : 'sakin';
+        document.getElementById('hava-icon').textContent  = HAVA_ICO[main] || '🌡️';
+        document.getElementById('hava-val').textContent   = HAVA_TR[main] || main;
+        document.getElementById('hava-sub').textContent   = kaynak;
+        document.getElementById('derece-val').textContent = derece + '°C';
+        document.getElementById('derece-sub').textContent = derece < 5 ? 'soğuk!' : derece > 32 ? 'sıcak!' : 'normal';
+        document.getElementById('mac-val').textContent    = macVar ? 'var ⚠️' : 'yok';
 
-        scoreGoster(puan, macVar);
-        arkaPlanRengiAyarla(puan, macVar);
+        scoreGoster(efektif);
 
-        const efektifPuan = macVar ? Math.min(puan, 55) : puan;
+        document.getElementById('ticker-text').textContent =
+            `büro skoru: ${efektif}/100  ·  ${HAVA_TR[main]||main}  ·  ${derece}°C`;
+        document.getElementById('ticker-right').textContent = macVar ? '⚽ maç var' : '✓ maç yok';
 
-        if (!bugunToplantiGunuMu) {
-            const gunFarki = sonrakiTopla ? Math.round((sonrakiTopla - simdi) / 86400000) : '?';
-            const sonrakiGunAdi = sonrakiTopla ? gunAdi[sonrakiTopla.getDay()] : '?';
-            statusGuncelle({ 
-                tip: 'toplanti-yok', 
-                desc: `${sonrakiGunAdi} toplantısına ${gunFarki} gün kaldı. Şimdiki tahmine göre: ${efektifPuan >= 70 ? 'bürodayız 🟢' : efektifPuan >= 40 ? 'tartışmalı 🟡' : 'online olabiliriz 🔴'}`
-            });
-            document.getElementById('next-meeting-info').textContent = 
-                sonrakiTopla ? `Sonraki: ${gunAdi[sonrakiTopla.getDay()]} ${sonrakiTopla.toLocaleDateString('tr-TR')}` : '';
-            animasyonOlustur(havaMain === 'Clear' ? 'sun' : havaMain === 'Rain' || havaMain === 'Drizzle' ? 'rain' : havaMain === 'Snow' ? 'snow' : '');
+        const headline = document.getElementById('main-headline');
+        const deck     = document.getElementById('main-deck');
+        headline.className = 'headline';
+
+        if (!bugunMu) {
+            const gunFarki   = sonraki ? Math.ceil((sonraki - simdi) / 86400000) : '?';
+            const sonrakiAdi = sonraki ? GUN_ADI[sonraki.getDay()] : '?';
+            headline.classList.add('durum-yok');
+            headline.textContent = 'bugün toplantı yok.';
+            deck.textContent = `${sonrakiAdi} toplantısına ${gunFarki} gün kaldı. şimdiki tahmine göre: ${efektif >= 70 ? 'bürodayız 🟢' : efektif >= 40 ? 'tartışmalı 🟡' : 'online olabiliriz 🔴'}`;
+            document.getElementById('next-info').textContent =
+                sonraki ? `sonraki: ${GUN_ADI[sonraki.getDay()]} ${sonraki.toLocaleDateString('tr-TR')}` : '';
+            animasyonYap(main === 'Rain' || main === 'Drizzle' ? 'rain' : main === 'Snow' ? 'snow' : '');
+        } else if (efektif >= 70) {
+            headline.classList.add('durum-burodayiz');
+            headline.textContent = 'bürodayız.';
+            deck.textContent = "19:30'da görüşürüz — önden gelen çay kahve demlesin.";
+            animasyonYap('');
+        } else if (efektif >= 40) {
+            headline.classList.add('durum-tartismali');
+            headline.textContent = 'tartışmalı.';
+            deck.textContent = macVar && puan > 55
+                ? 'hava fena değil ama maç var... önemli maç değilse büro diyelim.'
+                : 'hava kötü ama şekerden değiliz, erimeyiz... herhalde?';
+            animasyonYap('rain');
         } else {
-            if (efektifPuan >= 70) {
-                statusGuncelle({ tip: 'burodayiz' });
-                animasyonOlustur('sun');
-            } else if (efektifPuan >= 40) {
-                let aciklama = '';
-                if (macVar && puan > 55) aciklama = 'hava fena değil ama maç var... önemli maç değilse büro diyelim.';
-                else if (puan < 40) aciklama = 'hava kötü ama şekerden değiliz, erimeyiz... herhalde?';
-                else aciklama = 'durum belirsiz, karar vermek lazım.';
-                statusGuncelle({ tip: 'tartismali', desc: aciklama });
-                animasyonOlustur('rain');
-            } else {
-                let aciklama = '';
-                if (macVar && puan < 40) aciklama = 'hava kötü + maç var. Kadıköy\'e girilmez. zoom diyelim mi?';
-                else if (puan < 40) aciklama = 'hava çok kötü. zoom açalım, evimiz var.';
-                else aciklama = 'maç var, Kadıköy savaş alanı. online daha mantıklı.';
-                statusGuncelle({ tip: 'online', desc: aciklama });
-                animasyonOlustur(havaMain === 'Snow' ? 'snow' : 'rain');
-            }
+            headline.classList.add('durum-online');
+            headline.textContent = 'online olabiliriz.';
+            deck.textContent = macVar && puan < 40
+                ? "hava kötü + maç var. kadıköy'e girilmez. zoom diyelim mi?"
+                : main === 'Snow' ? 'kar yağıyor. evimiz var, zoom açalım.'
+                : 'hava çok kötü. zoom açalım.';
+            animasyonYap(main === 'Snow' ? 'snow' : 'rain');
         }
 
-    } catch (err) {
-        console.error(err);
-        document.getElementById('main-status').textContent = 'BAĞLANTI HATASI';
-        document.getElementById('main-desc').textContent = 'Hava durumu verileri çekilemedi.';
+    } catch(e) {
+        document.getElementById('main-headline').textContent = 'bağlantı hatası';
+        document.getElementById('main-deck').textContent = 'hava durumu verileri çekilemedi.';
     }
 
-    // Son güncelleme saatini yaz
-    const saat = simdi.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
-    document.getElementById('last-update-text').textContent = `Son güncelleme: ${saat}`;
-    const dot = document.getElementById('update-dot');
-    dot.classList.add('refreshing');
-    setTimeout(() => dot.classList.remove('refreshing'), 1500);
+    const saat = simdi.toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit' });
+    document.getElementById('update-text').textContent = `son güncelleme: ${saat}`;
+    const dot = document.getElementById('live-dot');
+    dot.classList.add('on');
+    setTimeout(() => dot.classList.remove('on'), 2000);
 }
 
-// Typo fix: fonksiyon adı
-function arkaPlanRengiAyarla(puan, macVar) {
-    const orb1 = document.getElementById('orb1');
-    const orb2 = document.getElementById('orb2');
-    if (puan >= 70) {
-        orb1.style.background = '#27ae60';
-        orb2.style.background = '#2ecc71';
-    } else if (puan >= 40) {
-        orb1.style.background = '#e67e22';
-        orb2.style.background = '#f39c12';
-    } else {
-        orb1.style.background = '#c0392b';
-        orb2.style.background = '#e74c3c';
+// ── Gazete ──
+async function gazeteyiYukle() {
+    const btn = document.getElementById('gazete-btn');
+    btn.classList.remove('spinning');
+    void btn.offsetWidth; // reflow — animasyonu sıfırla
+    btn.classList.add('spinning');
+
+    document.getElementById('gazete-icerik').innerHTML = '<div class="gazete-loading">yazı aranıyor...</div>';
+
+    try {
+        const url = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://www.gazetenisan.net');
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('fetch failed');
+        const html = await res.text();
+        const doc  = new DOMParser().parseFromString(html, 'text/html');
+
+        let yazilar = [];
+
+        // 1. Önce article/entry içindeki başlıkları dene
+        doc.querySelectorAll('article h2 a, article h3 a, .entry-title a, h2.entry-title a').forEach(el => {
+            const b = el.textContent.trim();
+            const l = el.getAttribute('href') || '';
+            if (b.length > 10 && b.length < 180 && l.includes('gazetenisan')) yazilar.push({ baslik:b, link:l });
+        });
+
+        // 2. Genel h2/h3
+        if (!yazilar.length) {
+            doc.querySelectorAll('h2 a, h3 a').forEach(el => {
+                const b = el.textContent.trim();
+                const l = el.getAttribute('href') || '';
+                if (b.length > 10 && b.length < 180 && l.includes('gazetenisan')) yazilar.push({ baslik:b, link:l });
+            });
+        }
+
+        // 3. Geniş tarama
+        if (!yazilar.length) {
+            doc.querySelectorAll('a').forEach(el => {
+                const b = el.textContent.trim();
+                const l = el.getAttribute('href') || '';
+                const fullL = l.startsWith('/') ? 'https://www.gazetenisan.net' + l : l;
+                if (b.length > 20 && b.length < 180 && fullL.includes('gazetenisan')
+                    && !fullL.includes('category') && !fullL.includes('tag') && !fullL.includes('author')) {
+                    yazilar.push({ baslik:b, link:fullL });
+                }
+            });
+        }
+
+        yazilar = yazilar.filter((y,i,a) => a.findIndex(x => x.link === y.link) === i);
+        if (!yazilar.length) throw new Error('boş');
+
+        const ilkBes  = yazilar.slice(0, 5);
+        const secilen = ilkBes[Math.floor(Math.random() * ilkBes.length)];
+
+        document.getElementById('gazete-icerik').innerHTML = `
+            <a class="gazete-link" href="${secilen.link}" target="_blank">
+                <span class="gazete-title-txt">${secilen.baslik}</span>
+                <span class="gazete-src">gazetenisan.net · okumak için dokun</span>
+            </a>
+        `;
+    } catch(e) {
+        document.getElementById('gazete-icerik').innerHTML =
+            '<div class="gazete-loading">yazı çekilemedi — biraz sonra tekrar dene 😞</div>';
     }
-    if (macVar) document.getElementById('orb3').style.background = '#e74c3c';
 }
 
 sistemiGuncelle();
-// Her 10 dakikada bir otomatik güncelle
 setInterval(sistemiGuncelle, 10 * 60 * 1000);
-
-// Gazete Nisan yazı çekici
-async function gazeteyiYukle() {
-    document.getElementById('gazete-icerik').innerHTML = '<div class="gazete-loading">yükleniyor...</div>';
-    try {
-        const proxy = 'https://api.allorigins.win/raw?url=';
-        const hedef = encodeURIComponent('https://www.gazetenisan.net');
-        const res = await fetch(proxy + hedef);
-        const html = await res.text();
-
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-
-        let yazilar = [];
-        doc.querySelectorAll('h2 a, h3 a').forEach(el => {
-            const baslik = el.textContent.trim();
-            const link = el.getAttribute('href') || '';
-            if (baslik.length > 10 && baslik.length < 150 && link.includes('gazetenisan')) {
-                yazilar.push({ baslik, link });
-            }
-        });
-
-        // Tekrarları temizle
-        yazilar = yazilar.filter((y, i, arr) =>
-            arr.findIndex(x => x.link === y.link) === i
-        );
-
-        if (yazilar.length === 0) throw new Error('Yazı bulunamadı');
-
-        // Sadece ilk 5 yazıdan seç (en güncel)
-        const ilkBes = yazilar.slice(0, 5);
-        const secilen = ilkBes[Math.floor(Math.random() * ilkBes.length)];
-
-        document.getElementById('gazete-card').href = secilen.link;
-        document.getElementById('gazete-icerik').innerHTML = `
-            <div class="gazete-title">${secilen.baslik}</div>
-            <div class="gazete-meta">gazetenisan.net · okumak için tıkla</div>
-        `;
-    } catch (e) {
-        document.getElementById('gazete-icerik').innerHTML = '<div class="gazete-loading">yazı çekilemedi 😞</div>';
-    }
-}
-
 gazeteyiYukle();
 </script>
 </body>
